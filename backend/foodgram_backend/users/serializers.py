@@ -1,18 +1,31 @@
-from djoser import serializers
-
-from users.models import User
-
-
-class UserListSerializer(serializers.UserSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', 'is_subscribed')
+from djoser.serializers import (
+    UserCreateSerializer,
+    UserSerializer,
+    # SetPasswordSerializer
+)
 
 
-class UserCreateSerializer(serializers.UserCreateSerializer):
+class CustomUserCreateSerializer(UserCreateSerializer):
 
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password')
+    class Meta(UserCreateSerializer.Meta):
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password'
+        )
+
+
+class CustomUserListSerializer(UserSerializer):
+
+    class Meta(UserSerializer.Meta):
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            # 'is_subscribed',
+        )
