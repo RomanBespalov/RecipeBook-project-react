@@ -61,6 +61,13 @@ class Ingredients(models.Model):
         max_length=20,
     )
 
+    def __str__(self):
+        return self.name[:15]
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
