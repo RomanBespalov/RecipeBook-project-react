@@ -172,3 +172,34 @@ class Subscribe(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+
+class IngredientAmount(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe',
+    )
+    ingredient = models.ForeignKey(
+        Ingredients,
+        on_delete=models.CASCADE,
+        related_name='ingredient',
+    )
+    amount = models.PositiveIntegerField(
+        'Количество',
+        default=1,
+        validators=(MinValueValidator(1, 'Минимум 1'),),
+    )
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique ingredient')]
+
+    def __str__(self):
+        return (f'В рецепте {self.recipe.name} {self.amount} '
+                f'{self.ingredient.measurement_unit} {self.ingredient.name}')
