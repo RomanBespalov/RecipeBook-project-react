@@ -1,20 +1,20 @@
 from rest_framework import viewsets
 
 from recipes.models import (
-    Tags,
+    Tag,
     Recipe,
-    Ingredients,
+    Ingredient,
 )
 from api.serializers import (
-    TagsSerializer,
+    TagSerializer,
     RecipeSerializer,
-    IngredientsSerializer,
+    IngredientSerializer,
 )
 
 
-class TagsViewSet(viewsets.ModelViewSet):
-    queryset = Tags.objects.all()
-    serializer_class = TagsSerializer
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -25,6 +25,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class IngredientsViewSet(viewsets.ModelViewSet):
-    queryset = Ingredients.objects.all()
-    serializer_class = IngredientsSerializer
+class IngredientViewSet(viewsets.ModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer

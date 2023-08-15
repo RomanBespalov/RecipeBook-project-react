@@ -3,7 +3,7 @@ from django.core.files.base import ContentFile
 
 from rest_framework import serializers
 
-from recipes.models import Tags, Recipe, Ingredients, IngredientAmount
+from recipes.models import Tag, Recipe, Ingredient, IngredientAmount
 
 
 class Base64ImageField(serializers.ImageField):
@@ -15,23 +15,23 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class TagsSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Tags
+        model = Tag
         fields = ('id', 'name', 'color', 'slug',)
 
 
-class IngredientsEditSerializer(serializers.ModelSerializer):
+class IngredientEditSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
 
     class Meta:
-        model = Ingredients
+        model = Ingredient
         fields = ('id', 'amount')
 
 
-class IngrediendAmountSerializer(serializers.ModelSerializer):
+class IngredientAmountSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(
         source='ingredient.id',
     )
@@ -49,11 +49,11 @@ class IngrediendAmountSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    ingredients = IngredientsEditSerializer(
+    ingredients = IngredientEditSerializer(
         many=True,
     )
     author = serializers.PrimaryKeyRelatedField(
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
@@ -69,7 +69,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                 IngredientAmount(
                     recipe=recipe,
                     ingredient_id=ingredient.get('id'),
-                    amount=ingredient.get('amount'),)
+                    amount=ingredient.get('amount'),
+                )
             ])
 
     def create(self, validated_data):
@@ -81,10 +82,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
 
-class IngredientsSerializer(serializers.ModelSerializer):
+class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Ingredients
+        model = Ingredient
         fields = (
             'id', 'name', 'measurement_unit',
         )

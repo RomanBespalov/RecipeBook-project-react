@@ -16,7 +16,7 @@ UNIT_CHOICES = [
 ]
 
 
-class Tags(models.Model):
+class Tag(models.Model):
     name = models.CharField(
         max_length=100,
         unique=True,
@@ -47,7 +47,7 @@ class Tags(models.Model):
         verbose_name_plural = 'Теги'
 
 
-class Ingredients(models.Model):
+class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название ингредиента',
@@ -88,11 +88,11 @@ class Recipe(models.Model):
         verbose_name='Описание',
     )
     ingredients = models.ManyToManyField(
-        Ingredients,
+        Ingredient,
         verbose_name='Ингредиенты',
     )
     tags = models.ManyToManyField(
-        Tags,
+        Tag,
         verbose_name='Теги',
     )
     cooking_time = models.IntegerField(
@@ -181,24 +181,21 @@ class IngredientAmount(models.Model):
         related_name='recipe',
     )
     ingredient = models.ForeignKey(
-        Ingredients,
+        Ingredient,
         on_delete=models.CASCADE,
         related_name='ingredient',
     )
-    amount = models.PositiveIntegerField(
-        'Количество',
+    amount = models.IntegerField(
+        verbose_name='Количество',
         default=1,
-        validators=(MinValueValidator(1, 'Минимум 1'),),
+        validators=(
+            MinValueValidator(1, message='Введите значение не менее 1'),
+        ),
     )
 
     class Meta:
-        ordering = ('id',)
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
-        constraints = [
-            models.UniqueConstraint(
-                fields=('recipe', 'ingredient'),
-                name='unique ingredient')]
 
     def __str__(self):
         return (f'В рецепте {self.recipe.name} {self.amount} '
