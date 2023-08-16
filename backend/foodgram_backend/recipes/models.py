@@ -4,16 +4,16 @@ from django.core.validators import MinValueValidator, RegexValidator
 from users.models import User
 
 
-UNIT_CHOICES = [
-    ('г', 'грамм'),
-    ('кг', 'килограмм'),
-    ('мл', 'миллилитр'),
-    ('л', 'литр'),
-    ('шт', 'штука'),
-    ('ст.л.', 'столовая ложка'),
-    ('по вкусу', 'по вкусу'),
-    ('щепотка', 'щепотка'),
-]
+# UNIT_CHOICES = [
+#     ('г', 'грамм'),
+#     ('кг', 'килограмм'),
+#     ('мл', 'миллилитр'),
+#     ('л', 'литр'),
+#     ('шт', 'штука'),
+#     ('ст.л.', 'столовая ложка'),
+#     ('по вкусу', 'по вкусу'),
+#     ('щепотка', 'щепотка'),
+# ]
 
 
 class Tag(models.Model):
@@ -52,11 +52,11 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Название ингредиента',
     )
-    count = models.IntegerField(
-        verbose_name='Количество',
-    )
+    # count = models.IntegerField(
+    #     verbose_name='Количество',
+    # )
     measurement_unit = models.CharField(
-        choices=UNIT_CHOICES,
+        # choices=UNIT_CHOICES,
         verbose_name='Единицы измерения',
         max_length=20,
     )

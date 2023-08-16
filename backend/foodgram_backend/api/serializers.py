@@ -81,6 +81,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
+    def update(self, instance, validated_data):
+        ingredients = validated_data.pop('ingredients', None)
+        tags = validated_data.pop('tags', None)
+
+        if ingredients is not None:
+            instance.ingredients.clear()
+            self.create_ingredients(ingredients, instance)
+        if tags is not None:
+            instance.tags.set(tags)
+
+        return super().update(instance, validated_data)
+
 
 class IngredientSerializer(serializers.ModelSerializer):
 
