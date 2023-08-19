@@ -4,18 +4,6 @@ from django.core.validators import MinValueValidator, RegexValidator
 from users.models import User
 
 
-# UNIT_CHOICES = [
-#     ('г', 'грамм'),
-#     ('кг', 'килограмм'),
-#     ('мл', 'миллилитр'),
-#     ('л', 'литр'),
-#     ('шт', 'штука'),
-#     ('ст.л.', 'столовая ложка'),
-#     ('по вкусу', 'по вкусу'),
-#     ('щепотка', 'щепотка'),
-# ]
-
-
 class Tag(models.Model):
     name = models.CharField(
         max_length=100,
@@ -52,21 +40,23 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Название ингредиента',
     )
-    # count = models.IntegerField(
-    #     verbose_name='Количество',
-    # )
     measurement_unit = models.CharField(
-        # choices=UNIT_CHOICES,
         verbose_name='Единицы измерения',
         max_length=20,
     )
 
-    def __str__(self):
-        return self.name[:15]
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'measurement_unit'),
+                name='unique_ingredient'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.name} - {self.measurement_unit}'
 
 
 class Recipe(models.Model):
@@ -101,6 +91,10 @@ class Recipe(models.Model):
             MinValueValidator(1, message='Введите значение не менее 1')
         ],
     )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации',
+    )
 
     def __str__(self):
         return self.name[:15]
@@ -108,6 +102,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
 
 
 class ShoppingList(models.Model):
@@ -150,28 +145,6 @@ class FavoriteRecipe(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
-
-
-class Subscribe(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='following',
-        verbose_name='Подписчик',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='followers',
-        verbose_name='Автор',
-    )
-
-    def __str__(self):
-        return f'{self.user} подписан на {self.author}'
-
-    class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
 
 
 class IngredientAmount(models.Model):
