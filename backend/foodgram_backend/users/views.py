@@ -1,11 +1,11 @@
-from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 
+from djoser.views import UserViewSet
 from rest_framework import status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from users.models import User, Subscribe
+from users.models import Subscribe, User
 from users.serializers import (
     CustomUserSerializer,
     SubscribeSerializer,
@@ -14,21 +14,24 @@ from users.serializers import (
 
 class CustomUserViewSet(UserViewSet):
     """
-    Вьюсет для работы с пользователями.
+    Вьюсет для работы с пользователями. Доступно для всех.
     Обработка запросов на создание и получение пользователей.
-    Доступно для всех.
     """
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (permissions.AllowAny,)
     add_serializer = SubscribeSerializer
 
-    @action(methods=['GET'], detail=False,
-            permission_classes=[permissions.IsAuthenticated])
+    @action(
+            methods=['GET'],
+            detail=False,
+            permission_classes=(permissions.IsAuthenticated,)
+    )
     def subscriptions(self, request):
         """
-        Для метода get выдает подписки.
-        Доступ для авторизванных.
+        Возвращает пользователей, на которых подписан текущий пользователь.
+        В выдачу добавляются рецепты.
+        Доступ для авторизванных. Разрешен метод GET.
         """
         user = self.request.user
         authors = User.objects.filter(followers__user=user)
@@ -38,11 +41,14 @@ class CustomUserViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=['POST', 'DELETE'], detail=True,
-            permission_classes=[permissions.IsAuthenticated])
+    @action(
+            methods=['POST', 'DELETE'],
+            detail=True,
+            permission_classes=(permissions.IsAuthenticated,)
+    )
     def subscribe(self, request, id):
         """
-        Для методов post, delete подписывается/отписывается от автора.
+        Разрешены методы POST, DELETE, подписка и отписка от автора.
         Доступ для авторизованных.
         """
         user = self.request.user
@@ -55,7 +61,9 @@ class CustomUserViewSet(UserViewSet):
                     {'error': 'Вы уже подписаны на этого пользователя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            serializer = SubscribeSerializer(author, context={'request': request})
+            serializer = SubscribeSerializer(
+                author, context={'request': request}
+            )
             Subscribe.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 

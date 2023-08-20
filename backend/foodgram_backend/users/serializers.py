@@ -1,11 +1,12 @@
-from djoser.serializers import UserSerializer, UserCreateSerializer
-from users.models import User, Subscribe
-from recipes.models import Recipe
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
+
+from recipes.models import Recipe
+from users.models import Subscribe, User
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для краткого отображения сведений о рецепте"""
+    """Сериализатор для краткого отображения сведений о рецепте."""
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -29,15 +30,18 @@ class CustomUserSerializer(UserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    """Сериализатор добавления/удаления подписки, просмотра подписок."""
+    """Сериализатор добавления, удаления и просмотра подписок."""
     recipes = ShortRecipeSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CustomUserSerializer.Meta):
-        fields = [*CustomUserSerializer.Meta.fields,
-                  'recipes', 'recipes_count']
-        read_only_fields = ['__all__']
+        fields = (
+            *CustomUserSerializer.Meta.fields,
+            'recipes',
+            'recipes_count'
+        )
+        read_only_fields = '__all__'
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
@@ -50,6 +54,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(UserCreateSerializer):
+    """Сериализатор для отображения данных после регистрации."""
     class Meta(UserCreateSerializer.Meta):
         model = User
         fields = ("email", "id", "username", "first_name",
