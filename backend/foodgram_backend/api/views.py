@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import F, Sum
+from django.db import models
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
@@ -10,6 +10,10 @@ from rest_framework.response import Response
 from api.serializers import (
     TagSerializer,
     IngredientSerializer,
+    RecipeListSerializer,
+    RecipeCreateUpdateSerializer,
+    FavoriteRecipeSerializer,
+    ShoppingListSerializer,
 )
 from recipes.models import (
     Tag,
@@ -75,7 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             detail=True,
             permission_classes=(permissions.IsAuthenticated,)
     )
-    def shopping_list(self, request, pk=None):
+    def shopping_cart(self, request, pk=None):
         return self.action_post_delete(pk, ShoppingListSerializer)
 
     @action(
@@ -84,9 +88,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,),
             pagination_class=None,
     )
-    def download_shopping_list(self, request):
+    def download_shopping_cart(self, request):
         """
-        Функция для добавлению рецептов в список покупок.
+        Функция для добавления рецептов в список покупок.
         Доступ для авторизованных.
         """
         user = request.user
@@ -98,9 +102,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = IngredientAmount.objects.filter(
             recipe__shopping_list__user=user
         ).values(
-            ingredients=F('ingredient__name'),
-            measure=F('ingredient__measurement_unit')
-        ).annotate(amount=Sum('amount'))
+            ingredients=models.F('ingredient__name'),
+            measure=models.F('ingredient__measurement_unit')
+        ).annotate(amount=models.Sum('amount'))
 
         filename = f'{user.username}_shopping_list.txt'
         shopping_list = (f'Список покупок\n\n{user.username}\n'
