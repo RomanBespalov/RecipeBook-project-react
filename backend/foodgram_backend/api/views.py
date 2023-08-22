@@ -26,6 +26,8 @@ from recipes.models import (
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -90,8 +92,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         """
-        Функция для добавления рецептов в список покупок.
-        Доступ для авторизованных.
+        Функция для скачивания списка покупок в TXT файл.
+        Доступно только авторизованным пользователям.
         """
         user = request.user
         if not user.shopping_list.exists():
@@ -113,8 +115,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             shopping_list += (
                 f'{ing["ingredients"]} - {ing["amount"]}, {ing["measure"]}\n'
             )
-        response = HttpResponse(shopping_list,
-                                content_type='text.txt; charset=utf-8')
+        response = HttpResponse(
+            shopping_list,
+            content_type='text.txt; charset=utf-8'
+        )
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
 
@@ -122,3 +126,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    search_fields = ('^name',)
+    pagination_class = None

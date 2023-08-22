@@ -72,7 +72,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return obj.favorites.filter(user=user).exists()
+        return obj.favorite_recipes.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
@@ -110,7 +110,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = data['ingredients']
         ingredients_list = []
-        am_message = 'Количество ингредиента должно быть больше или равно 1.'
+        error_message = 'Количество ингредиентов должно быть >= 1.'
         ingredient_message = 'Ингредиенты должны быть уникальными.'
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
@@ -122,7 +122,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             amount = ingredient['amount']
             if not int(amount) >= 1:
                 raise serializers.ValidationError(
-                    {'amount': am_message}
+                    {'amount': error_message}
                 )
 
         if not data['tags']:
@@ -137,7 +137,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 )
             tag_list.append(tag)
 
-        cook_message = 'Время приготовления должно быть больше или равно 1'
+        cook_message = 'Время приготовления должно быть >= 1'
         if not int(data['cooking_time']):
             raise serializers.ValidationError(
                 {'cooking_time': cook_message}
