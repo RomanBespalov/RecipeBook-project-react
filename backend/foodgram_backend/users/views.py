@@ -23,9 +23,9 @@ class CustomUserViewSet(UserViewSet):
     add_serializer = SubscribeSerializer
 
     @action(
-            methods=['GET'],
-            detail=False,
-            permission_classes=(permissions.IsAuthenticated,)
+        methods=['GET'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def subscriptions(self, request):
         """
@@ -42,9 +42,9 @@ class CustomUserViewSet(UserViewSet):
         return self.get_paginated_response(serializer.data)
 
     @action(
-            methods=['POST', 'DELETE'],
-            detail=True,
-            permission_classes=(permissions.IsAuthenticated,)
+        methods=['POST', 'DELETE'],
+        detail=True,
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def subscribe(self, request, id):
         """
