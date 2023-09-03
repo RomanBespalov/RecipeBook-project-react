@@ -132,4 +132,4 @@ dmypy.json
 .idea
 
 .DS_Store
-/media
+backend/foodgram_backend/media/

@@ -1,0 +1,134 @@
+from users.serializers import CustomUserSerializer
+from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient, Favorite
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+    ingredients = RecipeIngredientSerializer(
+        many=True,
+        source='recipeingredient_set',
+    )
+    author = CustomUserSerializer(read_only=True)
+    image = Base64ImageField()
+    is_favorited = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'tags', 'author', 'ingredients',
+                  'is_favorited', 'name', 'image',
+                  'text', 'cooking_time',
+                  )
+
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return Favorite.objects.filter(user=user, recipe=obj).exists()
+        return False
+
+
+class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient',
+        queryset=Ingredient.objects.all(),
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount')
+
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    ingredients = RecipeIngredientCreateSerializer(many=True)
+    image = Base64ImageField()
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ('name', 'tags', 'text',
+                  'cooking_time', 'ingredients', 'image')
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        image = validated_data.pop('image')
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        recipe_ingredients = []
+
+        for ingredient_data in ingredients:
+            recipe_ingredients.append(
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient_data['ingredient'],
+                    amount=ingredient_data['amount'],
+                )
+            )
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        recipe.tags.set(tags_data)
+        return recipe
+
+    def update(self, recipe, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        image = validated_data.pop('image')
+        if ingredients:
+            recipe_ingredients = []
+            RecipeIngredient.objects.filter(recipe=recipe).delete()
+            for ingredient_data in ingredients:
+                recipe_ingredients.append(
+                    RecipeIngredient(
+                        recipe=recipe,
+                        ingredient=ingredient_data['ingredient'],
+                        amount=ingredient_data['amount'],
+                    )
+                )
+            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        if tags_data:
+            recipe.tags.set(tags_data)
+        if image:
+            recipe.image = image
+
+        return super().update(recipe, validated_data)
+
+    def to_representation(self, instance):
+        data = RecipeSerializer(
+            instance, context={"request": self.context.get("request")}
+        ).data
+        return data
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
