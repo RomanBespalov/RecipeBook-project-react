@@ -21,7 +21,7 @@ class Recipe(models.Model):
         through_fields=('recipe', 'ingredient')
     )
     image = models.ImageField(
-        upload_to='media/',
+        upload_to='',
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -40,7 +40,6 @@ class Ingredient(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        # related_name='recipe_ingredients',
         on_delete=models.CASCADE,
     )
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
@@ -51,6 +50,18 @@ class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+
+
+class ShoppingCart(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart',
     )
     user = models.ForeignKey(
         User,

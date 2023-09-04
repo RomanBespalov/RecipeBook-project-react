@@ -1,7 +1,7 @@
 from users.serializers import CustomUserSerializer
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient, Favorite
+from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient, Favorite, ShoppingCart
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -32,18 +32,25 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'name', 'image',
-                  'text', 'cooking_time',
+                  'text', 'cooking_time', 'is_in_shopping_cart'
                   )
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
             return Favorite.objects.filter(user=user, recipe=obj).exists()
+        return False
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
         return False
 
 
