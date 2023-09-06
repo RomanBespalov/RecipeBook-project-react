@@ -1,8 +1,8 @@
 from djoser.views import UserViewSet
 from users.models import User, Subscription
 from users.pagination import CustomPagination
-from users.serializers import CustomUserSerializer, SubscriptionSerializer, SubscriptionCreateSerializer
-from rest_framework import permissions, status
+from users.serializers import CustomUserSerializer, SubscriptionSerializer
+from rest_framework import permissions, status, exceptions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -11,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = (permissions.AllowAny,)
     pagination_class = CustomPagination
 
     @action(
@@ -32,15 +31,31 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=[permissions.IsAuthenticated]
     )
     def subscribe(self, request, id):
+        subscriber = self.request.user
+        author = get_object_or_404(User, id=id)
         if request.method == "POST":
-            subscriber = self.request.user
-            author = get_object_or_404(User, id=id)
+            if subscriber == author:
+                raise exceptions.ValidationError(
+                    detail='Нельзя подписаться на себя!',
+                    code=status.HTTP_400_BAD_REQUEST,
+                )
+            if Subscription.objects.filter(user=subscriber, author=author).exists():
+                raise exceptions.ValidationError(
+                    detail='Вы уже подписаны на этого автора!',
+                    code=status.HTTP_400_BAD_REQUEST,
+                )
             subscription = Subscription.objects.create(user=subscriber, author=author)
-            serializer = SubscriptionCreateSerializer(subscription)
-            return Response(serializer.data)
+            serializer = SubscriptionSerializer(subscription)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                )
         if request.method == "DELETE":
-            subscriber = self.request.user
-            author = get_object_or_404(User, id=id)
+            if not Subscription.objects.filter(user=subscriber, author=author).exists():
+                raise exceptions.ValidationError(
+                    detail='У вас нет подписки на этого автора!',
+                    code=status.HTTP_400_BAD_REQUEST,
+                )
             subscription = Subscription.objects.filter(user=subscriber, author=author)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

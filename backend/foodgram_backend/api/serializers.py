@@ -100,7 +100,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def update(self, recipe, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        image = validated_data.pop('image')
         if ingredients:
             recipe_ingredients = []
             RecipeIngredient.objects.filter(recipe=recipe).delete()
@@ -115,8 +114,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
         if tags_data:
             recipe.tags.set(tags_data)
-        if image:
-            recipe.image = image
 
         return super().update(recipe, validated_data)
 

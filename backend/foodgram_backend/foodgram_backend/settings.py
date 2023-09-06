@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -118,7 +119,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ),
 }
 
@@ -127,6 +128,12 @@ DJOSER = {
     "HIDE_USERS": False,
     "SERIALIZERS": {
         "user_create": "users.serializers.CustomUserCreateSerializer",
-        "current_user": "users.serializers.CustomUserSerializer"
+        "current_user": "users.serializers.CustomUserSerializer",
+        "user": "users.serializers.CustomUserSerializer",
     },
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        "current_user": ['rest_framework.permissions.IsAuthenticated'],
+    }
 }
