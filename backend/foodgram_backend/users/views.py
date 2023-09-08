@@ -1,11 +1,12 @@
 from djoser.views import UserViewSet
-from users.models import User, Subscription
+from rest_framework import exceptions, permissions, status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
+
+from users.models import Subscription, User
 from users.pagination import CustomPagination
 from users.serializers import CustomUserSerializer, SubscriptionSerializer
-from rest_framework import permissions, status, exceptions
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 
 
 class CustomUserViewSet(UserViewSet):
@@ -39,23 +40,31 @@ class CustomUserViewSet(UserViewSet):
                     detail='Нельзя подписаться на себя!',
                     code=status.HTTP_400_BAD_REQUEST,
                 )
-            if Subscription.objects.filter(user=subscriber, author=author).exists():
+            if Subscription.objects.filter(
+                user=subscriber, author=author
+            ).exists():
                 raise exceptions.ValidationError(
                     detail='Вы уже подписаны на этого автора!',
                     code=status.HTTP_400_BAD_REQUEST,
                 )
-            subscription = Subscription.objects.create(user=subscriber, author=author)
+            subscription = Subscription.objects.create(
+                user=subscriber, author=author
+            )
             serializer = SubscriptionSerializer(subscription)
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED,
-                )
+            )
         if request.method == "DELETE":
-            if not Subscription.objects.filter(user=subscriber, author=author).exists():
+            if not Subscription.objects.filter(
+                user=subscriber, author=author
+            ).exists():
                 raise exceptions.ValidationError(
                     detail='У вас нет подписки на этого автора!',
                     code=status.HTTP_400_BAD_REQUEST,
                 )
-            subscription = Subscription.objects.filter(user=subscriber, author=author)
+            subscription = Subscription.objects.filter(
+                user=subscriber, author=author
+            )
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
