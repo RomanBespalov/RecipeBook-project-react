@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = ('django-insecure-2w=5otnn@-&0n='
               '(sct&#4@3wk=&c7$!5_aip_xr55uug3f-^-h')
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'blogforrecipes.hopto.org']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'blogforrecipes.hopto.org', '130.193.40.153']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
@@ -73,7 +73,6 @@ else:
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
             'HOST': os.getenv('DB_HOST', 'db'),
             'PORT': os.getenv('DB_PORT', 5432),
-            'TIMEZONE': 'UTC',
         }
     }
 
@@ -104,8 +103,8 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
