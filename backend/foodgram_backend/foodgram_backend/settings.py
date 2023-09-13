@@ -9,7 +9,7 @@ SECRET_KEY = ('django-insecure-2w=5otnn@-&0n='
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'blogforrecipes.hopto.org', '130.193.40.153']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgramblog.myddns.me', '130.193.40.153']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
