@@ -57,7 +57,7 @@ class Recipe(models.Model):
         verbose_name='Список ингредиентов',
     )
     image = models.ImageField(
-        upload_to='',
+        upload_to='recipes/images/',
         verbose_name='Картинка',
     )
     pub_date = models.DateTimeField(
