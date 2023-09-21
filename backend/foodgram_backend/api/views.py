@@ -17,6 +17,7 @@ from users.pagination import CustomPagination
 
 
 class IngredientViewSet(ModelViewSet):
+    """Вьюсет для ингредиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -26,6 +27,7 @@ class IngredientViewSet(ModelViewSet):
 
 
 class TagViewSet(ModelViewSet):
+    """Вьюсет для тегов."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
@@ -33,6 +35,7 @@ class TagViewSet(ModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
+    """Вьюсет для рецептов."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = CustomPagination

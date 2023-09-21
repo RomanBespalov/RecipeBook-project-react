@@ -6,6 +6,7 @@ from users.models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
+    """Сериализатор пользователей."""
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -23,6 +24,7 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
+    """Сериализатор для регистрации пользователей."""
 
     class Meta:
         model = User
@@ -53,6 +55,7 @@ class RecipeSubscriptionField(serializers.Field):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
+    """Cериализатор создания подписок."""
     email = serializers.ReadOnlyField(source="author.email")
     id = serializers.ReadOnlyField(source="author.id")
     username = serializers.ReadOnlyField(source="author.username")

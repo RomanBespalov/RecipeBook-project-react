@@ -133,7 +133,7 @@ class Favorite(models.Model):
 
 
 class ShoppingCart(models.Model):
-    """Модель списка покупок."""
+    """Модель список покупок."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,

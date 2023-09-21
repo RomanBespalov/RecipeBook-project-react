@@ -10,6 +10,7 @@ from users.serializers import CustomUserSerializer, SubscriptionSerializer
 
 
 class CustomUserViewSet(UserViewSet):
+    """Вьюсет для работы с пользователями."""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     pagination_class = CustomPagination

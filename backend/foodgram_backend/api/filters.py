@@ -5,10 +5,12 @@ from recipes.models import Recipe, Tag, User
 
 
 class IngredientSearchFilter(SearchFilter):
+    """Фильтр для ингредиентов."""
     search_param = 'name'
 
 
 class RecipeFilter(FilterSet):
+    """Фильтр для рецептов."""
     author = filters.ModelChoiceFilter(queryset=User.objects.all())
     tags = filters.ModelMultipleChoiceFilter(
         field_name="tags__slug",
