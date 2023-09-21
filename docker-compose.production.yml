@@ -28,9 +28,12 @@ services:
   gateway:
     image: romanbespalov/foodgram_gateway
     env_file: .env
+    restart: on-failure
     volumes:
       - static:/staticfiles
       - media:/media
       - ./docs:/usr/share/nginx/html/api/docs/
     ports:
       - 8000:80
+    depends_on:
+      - backend
