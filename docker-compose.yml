@@ -29,5 +29,6 @@ services:
     volumes:
       - static:/staticfiles
       - media:/media
+      - ./docs/:/docs
     ports:
       - 8000:80
