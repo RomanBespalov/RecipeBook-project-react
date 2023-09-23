@@ -126,7 +126,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = RecipeSerializer(
-            instance, context={"request": self.context.get("request")}
+            instance, context={'request': self.context.get('request')}
         ).data
         return data
 
@@ -136,7 +136,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class IngredientSerializer(serializers.ModelSerializer):

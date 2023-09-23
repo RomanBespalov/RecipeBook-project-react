@@ -22,11 +22,11 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = (RecipeIngredientInline, )
 
     def get_tags_display(self, obj):
-        return ", ".join([tag.name for tag in obj.tags.all()])
+        return ', '.join([tag.name for tag in obj.tags.all()])
     get_tags_display.short_description = 'Теги'
 
     def get_ingredients_display(self, obj):
-        return ", ".join(
+        return ', '.join(
             [ingredient.name for ingredient in obj.ingredients.all()]
         )
     get_ingredients_display.short_description = 'Ингредиенты'

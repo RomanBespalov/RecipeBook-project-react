@@ -17,7 +17,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        methods=["GET"],
+        methods=['GET'],
         permission_classes=[permissions.IsAuthenticated],
     )
     def subscriptions(self, serializer):
@@ -29,13 +29,13 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=["POST", "DELETE"],
+        methods=['POST', 'DELETE'],
         permission_classes=[permissions.IsAuthenticated]
     )
     def subscribe(self, request, id):
         subscriber = self.request.user
         author = get_object_or_404(User, id=id)
-        if request.method == "POST":
+        if request.method == 'POST':
             if subscriber == author:
                 raise exceptions.ValidationError(
                     detail='Нельзя подписаться на себя!',
@@ -56,7 +56,7 @@ class CustomUserViewSet(UserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED,
             )
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             if not Subscription.objects.filter(
                 user=subscriber, author=author
             ).exists():

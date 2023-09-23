@@ -22,7 +22,7 @@ class IngredientViewSet(ModelViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = (IngredientSearchFilter,)
-    search_fields = ("^name",)
+    search_fields = ('^name',)
     permission_classes = (permissions.AllowAny,)
 
 
@@ -62,13 +62,13 @@ class RecipeViewSet(ModelViewSet):
 
     @action(
         detail=True,
-        methods=["POST", "DELETE"],
+        methods=['POST', 'DELETE'],
         permission_classes=[permissions.IsAuthenticated]
     )
     def favorite(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == "POST":
+        if request.method == 'POST':
             if Favorite.objects.filter(recipe=recipe, user=user).exists():
                 raise exceptions.ValidationError(
                     detail='Рецепт уже есть в избранном!',
@@ -80,7 +80,7 @@ class RecipeViewSet(ModelViewSet):
                 data=serializer.data,
                 status=status.HTTP_201_CREATED,
             )
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             if not Favorite.objects.filter(recipe=recipe, user=user).exists():
                 raise exceptions.ValidationError(
                     detail='Рецепта не было в избранном!',
@@ -94,13 +94,13 @@ class RecipeViewSet(ModelViewSet):
 
     @action(
         detail=True,
-        methods=["POST", "DELETE"],
+        methods=['POST', 'DELETE'],
         permission_classes=[permissions.IsAuthenticated]
     )
     def shopping_cart(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == "POST":
+        if request.method == 'POST':
             if ShoppingCart.objects.filter(recipe=recipe, user=user).exists():
                 raise exceptions.ValidationError(
                     detail='Рецепт уже есть в списке покупок!',
@@ -113,7 +113,7 @@ class RecipeViewSet(ModelViewSet):
                 status=status.HTTP_201_CREATED,
             )
 
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             if not ShoppingCart.objects.filter(
                     recipe=recipe, user=user
             ).exists():
@@ -129,7 +129,7 @@ class RecipeViewSet(ModelViewSet):
 
     @action(
         detail=False,
-        methods=["GET"],
+        methods=['GET'],
         permission_classes=[permissions.IsAuthenticated]
     )
     def download_shopping_cart(self, request):

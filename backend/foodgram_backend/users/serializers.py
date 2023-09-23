@@ -29,8 +29,8 @@ class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
         fields = (
-            "email", "id", "username",
-            "first_name", "last_name", "password",
+            'email', 'id', 'username',
+            'first_name', 'last_name', 'password',
         )
 
 
@@ -45,10 +45,10 @@ class RecipeSubscriptionField(serializers.Field):
         for recipes in recipes_list:
             recipes_data.append(
                 {
-                    "id": recipes.id,
-                    "name": recipes.name,
-                    "image": recipes.image.url,
-                    "cooking_time": recipes.cooking_time,
+                    'id': recipes.id,
+                    'name': recipes.name,
+                    'image': recipes.image.url,
+                    'cooking_time': recipes.cooking_time,
                 }
             )
         return recipes_data
@@ -56,11 +56,11 @@ class RecipeSubscriptionField(serializers.Field):
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     """Cериализатор создания подписок."""
-    email = serializers.ReadOnlyField(source="author.email")
-    id = serializers.ReadOnlyField(source="author.id")
-    username = serializers.ReadOnlyField(source="author.username")
-    first_name = serializers.ReadOnlyField(source="author.first_name")
-    last_name = serializers.ReadOnlyField(source="author.last_name")
+    email = serializers.ReadOnlyField(source='author.email')
+    id = serializers.ReadOnlyField(source='author.id')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = RecipeSubscriptionField()
     recipes_count = serializers.SerializerMethodField(read_only=True)
@@ -68,14 +68,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "recipes",
-            'recipes_count',
+            'email', 'id', 'username',
+            'first_name', 'last_name', 'is_subscribed',
+            'recipes', 'recipes_count',
         )
 
     def get_is_subscribed(self, obj):

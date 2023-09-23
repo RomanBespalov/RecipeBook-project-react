@@ -23,6 +23,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ['name', 'color']
 
     def __str__(self):
         return self.name
@@ -69,7 +70,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ["-pub_date"]
+        ordering = ['-pub_date', 'name']
 
     def __str__(self):
         return self.name
@@ -89,6 +90,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ['name', 'measurement_unit']
 
     def __str__(self):
         return self.name
@@ -110,6 +112,14 @@ class RecipeIngredient(models.Model):
         verbose_name='Количество',
     )
 
+    class Meta:
+        verbose_name = 'Рецепт-Ингредиент'
+        verbose_name_plural = 'Рецепты-Ингредиенты'
+        ordering = ['recipe', 'ingredient']
+
+    def __str__(self):
+        return f'{self.recipe.name} - {self.ingredient.name} {self.amount}'
+
 
 class Favorite(models.Model):
     """Модель избранное."""
@@ -127,6 +137,7 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        ordering = ['user', 'recipe']
 
     def __str__(self):
         return f'Рецепт {self.recipe.name} в избранном у {self.user.username}'
@@ -149,6 +160,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
+        ordering = ['user', 'recipe']
 
     def __str__(self):
         return (f'Рецепт {self.recipe.name} '
