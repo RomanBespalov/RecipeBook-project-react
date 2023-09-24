@@ -91,13 +91,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'tags', 'text',
                   'cooking_time', 'ingredients', 'image')
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags_data = validated_data.pop('tags')
-        image = validated_data.pop('image')
-        recipe = Recipe.objects.create(image=image, **validated_data)
+    def create_ingredients(ingredients, recipe):
         recipe_ingredients = []
-
         for ingredient_data in ingredients:
             recipe_ingredients.append(
                 RecipeIngredient(
@@ -107,6 +102,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 )
             )
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        image = validated_data.pop('image')
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        self.create_ingredients(ingredients, recipe)
         recipe.tags.set(tags_data)
         return recipe
 
@@ -114,17 +116,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         if ingredients:
-            recipe_ingredients = []
             RecipeIngredient.objects.filter(recipe=recipe).delete()
-            for ingredient_data in ingredients:
-                recipe_ingredients.append(
-                    RecipeIngredient(
-                        recipe=recipe,
-                        ingredient=ingredient_data['ingredient'],
-                        amount=ingredient_data['amount'],
-                    )
-                )
-            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+            self.create_ingredients(ingredients, recipe)
         if tags_data:
             recipe.tags.set(tags_data)
 
