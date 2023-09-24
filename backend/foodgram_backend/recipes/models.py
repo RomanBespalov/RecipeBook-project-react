@@ -1,8 +1,10 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from users.models import User
 
+MIN_NUMBER = 1
+MAX_NUMBER = 32000
 
 class Tag(models.Model):
     """Модель тегов."""
@@ -35,9 +37,12 @@ class Recipe(models.Model):
         verbose_name='Название',
         max_length=200,
     )
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления (в минутах)',
-        validators=[MinValueValidator(1)],
+        validators=[
+            MinValueValidator(MIN_NUMBER),
+            MaxValueValidator(MAX_NUMBER)
+        ],
     )
     text = models.TextField(
         verbose_name='Описание',
@@ -108,8 +113,12 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
+        validators=[
+            MinValueValidator(MIN_NUMBER),
+            MaxValueValidator(MAX_NUMBER)
+        ],
     )
 
     class Meta:
