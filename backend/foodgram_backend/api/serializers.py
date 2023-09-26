@@ -92,6 +92,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                   'cooking_time', 'ingredients', 'image')
 
     def validate_cooking_time(self, cooking_time):
+        print(cooking_time)
         if cooking_time <= MIN_NUMBER:
             raise serializers.ValidationError(
                 'Время приготовления должно быть больше 0'
@@ -103,6 +104,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return cooking_time
 
     def validate_ingredients(self, ingredients):
+        print(ingredients)
         for ingredient in ingredients:
             if int(ingredient['amount']) <= MIN_NUMBER:
                 raise serializers.ValidationError(
