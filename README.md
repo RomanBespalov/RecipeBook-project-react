@@ -31,7 +31,7 @@
 
 ## Технологии  
 
-Python Django DRF PostgreSQL Docker Yandex Cloud CI CD  
+```Python``` ```Django DRF``` ```PostgreSQL``` ```Docker``` ```Yandex Cloud``` ```CI``` ```CD```  
 
 ## Автор  
 Беспалов Роман  
