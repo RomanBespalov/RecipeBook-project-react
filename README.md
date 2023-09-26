@@ -4,6 +4,8 @@
 адрес сервера - https://foodgramblog.myddns.me  
 администратор: логин - a@a.ru, пароль - q  
 
+Документация доступна по https://foodgramblog.myddns.me/api/docs/  
+
 ## Инструкция для локального запуска  
 
 Сервер - http://localhost:8000/  
@@ -26,3 +28,10 @@
 
 Копируем ее в папку backend_static  
 ```cp -r /app/collected_static/. /backend_static/static/ ```  
+
+## Технологии  
+
+Python Django DRF PostgreSQL Docker Yandex Cloud CI CD  
+
+## Автор  
+Беспалов Роман  
