@@ -65,10 +65,9 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
         source='ingredient',
         queryset=Ingredient.objects.all(),
     )
-    amount = serializers.IntegerField()
-    # amount = serializers.IntegerField(
-    #     min_value=MIN_NUMBER, max_value=MAX_NUMBER
-    # )
+    amount = serializers.IntegerField(
+        min_value=MIN_NUMBER, max_value=MAX_NUMBER
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -83,10 +82,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
-    cooking_time = serializers.IntegerField()
-    # cooking_time = serializers.IntegerField(
-    #     min_value=MIN_NUMBER, max_value=MAX_NUMBER
-    # )
+    cooking_time = serializers.IntegerField(
+        min_value=MIN_NUMBER, max_value=MAX_NUMBER
+    )
 
     class Meta:
         model = Recipe
@@ -130,29 +128,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             instance, context={'request': self.context.get('request')}
         ).data
         return data
-
-    def validate_cooking_time(self, cooking_time):
-        if cooking_time <= MIN_NUMBER:
-            raise serializers.ValidationError(
-                'Время приготовления должно быть больше 0'
-            )
-        if cooking_time > MAX_NUMBER:
-            raise serializers.ValidationError(
-                'Время приготовления не может быть больше 32000'
-            )
-        return cooking_time
-
-    def validate_ingredients(self, ingredients):
-        for ingredient in ingredients:
-            if int(ingredient['amount']) <= MIN_NUMBER:
-                raise serializers.ValidationError(
-                    'Количество ингредиентов должно быть больше 0'
-                )
-            if int(ingredient['amount']) > MAX_NUMBER:
-                raise serializers.ValidationError(
-                    'Количество ингредиентов не может быть больше 32000'
-                )
-        return ingredients
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
