@@ -91,28 +91,30 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'tags', 'text',
                   'cooking_time', 'ingredients', 'image')
 
-    def validate_cooking_time(self, cooking_time):
-        if cooking_time <= MIN_NUMBER:
-            raise serializers.ValidationError(
-                'Время приготовления должно быть больше 0'
-            )
-        if cooking_time > MAX_NUMBER:
-            raise serializers.ValidationError(
-                'Время приготовления не может быть больше 32000'
-            )
-        return cooking_time
+    # def validate_cooking_time(self, cooking_time):
+    #     print(cooking_time)
+    #     if cooking_time <= MIN_NUMBER:
+    #         raise serializers.ValidationError(
+    #             'Время приготовления должно быть больше 0'
+    #         )
+    #     if cooking_time > MAX_NUMBER:
+    #         raise serializers.ValidationError(
+    #             'Время приготовления не может быть больше 32000'
+    #         )
+    #     return cooking_time
 
-    def validate_ingredients(self, ingredients):
-        for ingredient in ingredients:
-            if int(ingredient['amount']) <= MIN_NUMBER:
-                raise serializers.ValidationError(
-                    'Количество ингредиентов должно быть больше 0'
-                )
-            if int(ingredient['amount']) > MAX_NUMBER:
-                raise serializers.ValidationError(
-                    'Количество ингредиентов не может быть больше 32000'
-                )
-        return ingredients
+    # def validate_ingredients(self, ingredients):
+    #     print(ingredients)
+    #     for ingredient in ingredients:
+    #         if int(ingredient['amount']) <= MIN_NUMBER:
+    #             raise serializers.ValidationError(
+    #                 'Количество ингредиентов должно быть больше 0'
+    #             )
+    #         if int(ingredient['amount']) > MAX_NUMBER:
+    #             raise serializers.ValidationError(
+    #                 'Количество ингредиентов не может быть больше 32000'
+    #             )
+    #     return ingredients
 
     def create_ingredients(ingredients, recipe):
         recipe_ingredients = []
