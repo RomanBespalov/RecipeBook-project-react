@@ -66,7 +66,12 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all(),
     )
     amount = serializers.IntegerField(
-        min_value=MIN_NUMBER, max_value=MAX_NUMBER
+        min_value=MIN_NUMBER,
+        max_value=MAX_NUMBER,
+        error_messages={
+            'min_value': 'Минимальное количество ингредиентов - 1.',
+            'max_value': 'Максимальное количество ингредиентов - 32000.'
+        }
     )
 
     class Meta:
@@ -83,7 +88,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         many=True
     )
     cooking_time = serializers.IntegerField(
-        min_value=MIN_NUMBER, max_value=MAX_NUMBER
+        min_value=MIN_NUMBER,
+        max_value=MAX_NUMBER,
+        error_messages={
+            'min_value': 'Минимальное время приготовления 1 минута.',
+            'max_value': 'Максимальное время приготовления 32000 минут.'
+        }
     )
 
     class Meta:
