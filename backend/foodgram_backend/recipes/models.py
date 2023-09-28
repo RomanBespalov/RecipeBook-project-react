@@ -43,11 +43,11 @@ class Recipe(models.Model):
         default=1,
         validators=[
             MinValueValidator(
-                1,
+                MIN_NUMBER,
                 message='Минимальное время приготовления 1 минута.'
             ),
             MaxValueValidator(
-                32000,
+                MAX_NUMBER,
                 message='Максимальное время приготовления 32000 минут.'
             )
         ],
@@ -71,7 +71,7 @@ class Recipe(models.Model):
         verbose_name='Список ингредиентов',
     )
     image = models.ImageField(
-        upload_to='recipes/images/',
+        upload_to='',
         verbose_name='Картинка',
     )
     pub_date = models.DateTimeField(
