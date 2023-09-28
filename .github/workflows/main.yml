@@ -43,6 +43,7 @@ jobs:
           context: ./backend/foodgram_backend/
           push: true
           tags: romanbespalov/foodgram_backend:latest
+          platforms: linux/amd64
 
   build_frontend_and_push_to_docker_hub:
       name: Push frontend Docker image to DockerHub
@@ -63,6 +64,7 @@ jobs:
             context: ./frontend/
             push: true
             tags: romanbespalov/foodgram_frontend:latest
+            platforms: linux/amd64
 
   build_gateway_and_push_to_docker_hub:
       name: Push gateway Docker image to DockerHub
@@ -83,6 +85,7 @@ jobs:
             context: ./infra/
             push: true
             tags: romanbespalov/foodgram_gateway:latest
+            platforms: linux/amd64
 
   deploy:
     runs-on: ubuntu-latest
