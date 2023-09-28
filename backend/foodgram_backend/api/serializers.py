@@ -88,8 +88,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         many=True
     )
     cooking_time = serializers.IntegerField(
-        min_value=MIN_NUMBER,
-        max_value=MAX_NUMBER,
+        min_value=1,
+        max_value=32000,
         error_messages={
             'min_value': 'Минимальное время приготовления 1 минута.',
             'max_value': 'Максимальное время приготовления 32000 минут.'

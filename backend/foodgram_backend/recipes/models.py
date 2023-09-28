@@ -43,11 +43,11 @@ class Recipe(models.Model):
         default=1,
         validators=[
             MinValueValidator(
-                MIN_NUMBER,
+                1,
                 message='Минимальное время приготовления 1 минута.'
             ),
             MaxValueValidator(
-                MAX_NUMBER,
+                32000,
                 message='Максимальное время приготовления 32000 минут.'
             )
         ],
