@@ -14,6 +14,7 @@ services:
   backend:
     image: romanbespalov/foodgram_backend
     env_file: .env
+    restart: always
     volumes:
       - static:/backend_static
       - media:/media
@@ -22,13 +23,14 @@ services:
   frontend:
     image: romanbespalov/foodgram_frontend
     env_file: .env
+    restart: always
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
   gateway:
     image: romanbespalov/foodgram_gateway
     env_file: .env
-    restart: on-failure
+    restart: always
     volumes:
       - static:/staticfiles
       - media:/media
