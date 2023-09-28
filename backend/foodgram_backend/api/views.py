@@ -44,7 +44,7 @@ class RecipeViewSet(ModelViewSet):
 
     def get_queryset(self):
         recipes = Recipe.objects.prefetch_related(
-            'recipeingredient_set__ingredient', 'tags'
+            'recipe_ingredient_set__ingredient', 'tags'
         ).all()
         return recipes
 
