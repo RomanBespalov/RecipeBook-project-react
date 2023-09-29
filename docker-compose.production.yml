@@ -25,10 +25,11 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
+    depends_on:
+      - db
   gateway:
     image: romanbespalov/foodgram_gateway
     env_file: .env
-    restart: on-failure
     volumes:
       - static:/staticfiles
       - media:/media
