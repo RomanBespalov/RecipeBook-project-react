@@ -9,6 +9,7 @@ class RecipeIngredientInline(admin.TabularInline):
     extra = 1
     verbose_name = 'Ингредиент для рецепта'
     verbose_name_plural = 'Ингредиенты для рецепта'
+    min_num = 1
 
 
 @admin.register(Tag)

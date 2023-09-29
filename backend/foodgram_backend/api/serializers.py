@@ -1,8 +1,7 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.serializers import CustomUserSerializer
 
 
@@ -32,7 +31,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipeingredient_set',
+        source='recipe_ingredient',
     )
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
@@ -49,13 +48,13 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return Favorite.objects.filter(user=user, recipe=obj).exists()
+            return user.favorite_recipe.filter(recipe=obj).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
+            return user.shopping_cart_recipe.filter(recipe=obj).exists()
         return False
 
 
@@ -85,13 +84,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'tags', 'text',
                   'cooking_time', 'ingredients', 'image')
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags_data = validated_data.pop('tags')
-        image = validated_data.pop('image')
-        recipe = Recipe.objects.create(image=image, **validated_data)
+    @staticmethod
+    def create_ingredients(ingredients, recipe):
         recipe_ingredients = []
-
         for ingredient_data in ingredients:
             recipe_ingredients.append(
                 RecipeIngredient(
@@ -101,6 +96,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 )
             )
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        image = validated_data.pop('image')
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        self.create_ingredients(ingredients, recipe)
         recipe.tags.set(tags_data)
         return recipe
 
@@ -108,17 +110,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         if ingredients:
-            recipe_ingredients = []
-            RecipeIngredient.objects.filter(recipe=recipe).delete()
-            for ingredient_data in ingredients:
-                recipe_ingredients.append(
-                    RecipeIngredient(
-                        recipe=recipe,
-                        ingredient=ingredient_data['ingredient'],
-                        amount=ingredient_data['amount'],
-                    )
-                )
-            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+            ingredients.recipe_ingredient.filter(recipe=recipe).delete()
+            self.create_ingredients(ingredients, recipe)
         if tags_data:
             recipe.tags.set(tags_data)
 

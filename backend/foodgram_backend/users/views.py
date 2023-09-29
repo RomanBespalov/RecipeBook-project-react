@@ -22,7 +22,7 @@ class CustomUserViewSet(UserViewSet):
     )
     def subscriptions(self, serializer):
         user = self.request.user
-        user_subscriptions = Subscription.objects.filter(user=user)
+        user_subscriptions = user.following.all()
         pages = self.paginate_queryset(user_subscriptions)
         serializer = SubscriptionSerializer(pages, many=True)
         return self.get_paginated_response(serializer.data)
@@ -35,37 +35,20 @@ class CustomUserViewSet(UserViewSet):
     def subscribe(self, request, id):
         subscriber = self.request.user
         author = get_object_or_404(User, id=id)
+        subscription = Subscription.objects.get_or_create(
+            user=subscriber, author=author
+        )
         if request.method == 'POST':
-            if subscriber == author:
-                raise exceptions.ValidationError(
-                    detail='Нельзя подписаться на себя!',
-                    code=status.HTTP_400_BAD_REQUEST,
-                )
-            if Subscription.objects.filter(
-                user=subscriber, author=author
-            ).exists():
-                raise exceptions.ValidationError(
-                    detail='Вы уже подписаны на этого автора!',
-                    code=status.HTTP_400_BAD_REQUEST,
-                )
-            subscription = Subscription.objects.create(
-                user=subscriber, author=author
-            )
-            serializer = SubscriptionSerializer(subscription)
+            serializer = SubscriptionSerializer(subscription[0])
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED,
             )
         if request.method == 'DELETE':
-            if not Subscription.objects.filter(
-                user=subscriber, author=author
-            ).exists():
+            if not subscriber.following.exists():
                 raise exceptions.ValidationError(
                     detail='У вас нет подписки на этого автора!',
                     code=status.HTTP_400_BAD_REQUEST,
                 )
-            subscription = Subscription.objects.filter(
-                user=subscriber, author=author
-            )
-            subscription.delete()
+            subscription[0].delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

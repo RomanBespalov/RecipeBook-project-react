@@ -1,7 +1,10 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from users.models import User
+
+MIN_NUMBER = 1
+MAX_NUMBER = 32000
 
 
 class Tag(models.Model):
@@ -35,9 +38,19 @@ class Recipe(models.Model):
         verbose_name='Название',
         max_length=200,
     )
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления (в минутах)',
-        validators=[MinValueValidator(1)],
+        default=1,
+        validators=[
+            MinValueValidator(
+                MIN_NUMBER,
+                message='Минимальное время приготовления 1 минута.'
+            ),
+            MaxValueValidator(
+                MAX_NUMBER,
+                message='Максимальное время приготовления 32000 минут.'
+            )
+        ],
     )
     text = models.TextField(
         verbose_name='Описание',
@@ -101,15 +114,27 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
+        related_name='recipe_ingredient',
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
+        default=1,
+        validators=[
+            MinValueValidator(
+                MIN_NUMBER,
+                message='Минимальное количество ингредиентов - 1.'
+            ),
+            MaxValueValidator(
+                MAX_NUMBER,
+                message='Максимальное количество ингредиентов - 32000.'
+            )
+        ],
     )
 
     class Meta:
@@ -127,11 +152,13 @@ class Favorite(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
+        related_name='favorite_recipe',
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
+        related_name='favorite_user',
     )
 
     class Meta:
@@ -148,13 +175,14 @@ class ShoppingCart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_cart',
+        related_name='shopping_cart_recipe',
         verbose_name='Рецепт',
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
+        related_name='shopping_cart_user',
     )
 
     class Meta:
