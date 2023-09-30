@@ -85,7 +85,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         subscriber = data['user']
-        author = data.get['author']
+        author = data['author']
         if subscriber == author:
             raise exceptions.ValidationError(
                 detail='Нельзя подписаться на самого себя!',

@@ -1,7 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
+from rest_framework import exceptions, serializers, status
 
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from recipes.models import (MAX_NUMBER, MIN_NUMBER, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
 from users.serializers import CustomUserSerializer
 
 
@@ -64,6 +65,14 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
         source='ingredient',
         queryset=Ingredient.objects.all(),
     )
+    amount = serializers.IntegerField(
+        min_value=MIN_NUMBER,
+        max_value=MAX_NUMBER,
+        error_messages={
+            'min_value': 'Минимальное количество ингредиентов - 1.',
+            'max_value': 'Максимальное количество ингредиентов - 32000.'
+        }
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -77,6 +86,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
+    )
+    cooking_time = serializers.IntegerField(
+        min_value=MIN_NUMBER,
+        max_value=MAX_NUMBER,
+        error_messages={
+            'min_value': 'Минимальное время приготовления 1 минута.',
+            'max_value': 'Максимальное время приготовления 32000 минут.'
+        }
     )
 
     class Meta:
@@ -125,11 +142,39 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления рецепта в избранное и список покупок."""
+    """Сериализатор для добавления рецепта в избранное."""
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+    def validate(self, data):
+        user = data['user']
+        recipe = data['recipe']
+        if user.favorite.filter(recipe=recipe).exists():
+            raise exceptions.ValidationError(
+                detail='Рецепт уже есть в избранном!',
+                code=status.HTTP_400_BAD_REQUEST,
+            )
+        return data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления рецепта в список покупок."""
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+    def validate(self, data):
+        user = data['user']
+        recipe = data['recipe']
+        if user.shopping_cart.filter(recipe=recipe).exists():
+            raise exceptions.ValidationError(
+                detail='Рецепт уже есть в списке покупок!',
+                code=status.HTTP_400_BAD_REQUEST,
+            )
+        return data
 
 
 class IngredientSerializer(serializers.ModelSerializer):
