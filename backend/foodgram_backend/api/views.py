@@ -67,9 +67,6 @@ class RecipeViewSet(ModelViewSet):
     def favorite(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        favorited_recipe = Favorite.objects.get_or_create(
-            recipe=recipe, user=user
-        )
         if request.method == 'POST':
             data = {
                 'user': user.id,
@@ -105,9 +102,6 @@ class RecipeViewSet(ModelViewSet):
     def shopping_cart(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        shopping_cart = ShoppingCart.objects.get_or_create(
-            recipe=recipe, user=user
-        )
         if request.method == 'POST':
             data = {
                 'user': user.id,
