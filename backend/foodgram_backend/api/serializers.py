@@ -146,34 +146,6 @@ class ShoppingCartFavoriteSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
-    def validate(self, data):
-        user = data['user']
-        recipe = data['recipe']
-        if user.favorite_recipe.filter(recipe=recipe).exists():
-            raise exceptions.ValidationError(
-                detail='Рецепт уже есть в избранном!',
-                code=status.HTTP_400_BAD_REQUEST,
-            )
-        return data
-
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления рецепта в список покупок."""
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-
-    def validate(self, data):
-        user = data['user']
-        recipe = data['recipe']
-        if user.shopping_cart_recipe.filter(recipe=recipe).exists():
-            raise exceptions.ValidationError(
-                detail='Рецепт уже есть в списке покупок!',
-                code=status.HTTP_400_BAD_REQUEST,
-            )
-        return data
-
 
 class FavoriteSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления рецепта в избранное."""
