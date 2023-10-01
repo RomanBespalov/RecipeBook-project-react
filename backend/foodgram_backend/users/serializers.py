@@ -19,7 +19,7 @@ class CustomUserSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return Subscription.objects.filter(user=user, author=obj).exists()
+            return user.follower.filter(author=obj).exists()
         return False
 
 
@@ -84,8 +84,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(author=obj.author).count()
 
     def validate(self, data):
-        subscriber = data.get('user')
-        author = data.get('author')
+        subscriber = data['user']
+        author = data['author']
         if subscriber == author:
             raise exceptions.ValidationError(
                 detail='Нельзя подписаться на самого себя!',
