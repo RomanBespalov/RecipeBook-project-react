@@ -1,8 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import exceptions, serializers, status
 
-from recipes.models import (MAX_NUMBER, MIN_NUMBER, Ingredient, Recipe,
-                            RecipeIngredient, Tag)
+from recipes.models import (MAX_NUMBER, MIN_NUMBER, Favorite, Ingredient,
+                            Recipe, RecipeIngredient, ShoppingCart, Tag)
 from users.serializers import CustomUserSerializer
 
 
@@ -141,21 +141,36 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления рецепта в избранное."""
-
+class ShoppingCartFavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления рецепта в избранное."""
+
+    class Meta:
+        model = Favorite
+        fields = ('user', 'recipe')
+
     def validate(self, data):
         user = data['user']
         recipe = data['recipe']
-        if user.favorite.filter(recipe=recipe).exists():
+        if Favorite.objects.filter(
+            user=user,
+            recipe=recipe
+        ).exists():
             raise exceptions.ValidationError(
                 detail='Рецепт уже есть в избранном!',
                 code=status.HTTP_400_BAD_REQUEST,
             )
+        return data
+
+    def to_representation(self, instance):
+        data = ShoppingCartFavoriteSerializer(
+            instance.recipe, context={'request': self.context.get('request')}
+        ).data
         return data
 
 
@@ -163,17 +178,26 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления рецепта в список покупок."""
 
     class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+        model = ShoppingCart
+        fields = ('user', 'recipe')
 
     def validate(self, data):
         user = data['user']
         recipe = data['recipe']
-        if user.shopping_cart.filter(recipe=recipe).exists():
+        if ShoppingCart.objects.filter(
+            user=user,
+            recipe=recipe
+        ).exists():
             raise exceptions.ValidationError(
                 detail='Рецепт уже есть в списке покупок!',
                 code=status.HTTP_400_BAD_REQUEST,
             )
+        return data
+
+    def to_representation(self, instance):
+        data = ShoppingCartFavoriteSerializer(
+            instance.recipe, context={'request': self.context.get('request')}
+        ).data
         return data
 
 
