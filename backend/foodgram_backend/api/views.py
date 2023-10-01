@@ -117,9 +117,7 @@ class RecipeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            if not ShoppingCart.objects.filter(
-                recipe=recipe, user=user
-            ).exists():
+            if not user.shopping_cart.filter(recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     detail='Рецепта не было в списке покупок!',
                     code=status.HTTP_400_BAD_REQUEST,
@@ -127,7 +125,8 @@ class RecipeViewSet(ModelViewSet):
             shopping_cart_in = get_object_or_404(
                 ShoppingCart,
                 user=user,
-                recipe=recipe)
+                recipe=recipe
+            )
             shopping_cart_in.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 

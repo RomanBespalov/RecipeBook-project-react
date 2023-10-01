@@ -127,7 +127,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         if ingredients:
-            ingredients.recipe_ingredient.filter(recipe=recipe).delete()
+            recipe.recipe_ingredient.all().delete()
             self.create_ingredients(ingredients, recipe)
         if tags_data:
             recipe.tags.set(tags_data)
@@ -157,10 +157,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = data['user']
         recipe = data['recipe']
-        if Favorite.objects.filter(
-            user=user,
-            recipe=recipe
-        ).exists():
+        if user.favorite.filter(recipe=recipe).exists():
             raise exceptions.ValidationError(
                 detail='Рецепт уже есть в избранном!',
                 code=status.HTTP_400_BAD_REQUEST,
@@ -184,10 +181,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = data['user']
         recipe = data['recipe']
-        if ShoppingCart.objects.filter(
-            user=user,
-            recipe=recipe
-        ).exists():
+        if user.shopping_cart.filter(recipe=recipe).exists():
             raise exceptions.ValidationError(
                 detail='Рецепт уже есть в списке покупок!',
                 code=status.HTTP_400_BAD_REQUEST,
