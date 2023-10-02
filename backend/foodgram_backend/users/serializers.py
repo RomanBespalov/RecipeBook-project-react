@@ -83,6 +83,13 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
 
+
+class SubscribeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscription
+        fields = ('user', 'author')
+
     def validate(self, data):
         subscriber = data['user']
         author = data['author']
@@ -91,9 +98,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 detail='Нельзя подписаться на самого себя!',
                 code=status.HTTP_400_BAD_REQUEST,
             )
-        if subscriber.following.filter(author=author).exists():
+        if subscriber.follower.filter(author=author).exists():
             raise exceptions.ValidationError(
                 detail='Вы уже подписаны на этого автора!',
                 code=status.HTTP_400_BAD_REQUEST,
             )
+        return data
+
+    def to_representation(self, instance):
+        data = SubscriptionSerializer(
+            instance, context={'request': self.context.get('request')}
+        ).data
         return data

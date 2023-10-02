@@ -6,7 +6,8 @@ from rest_framework.response import Response
 
 from users.models import Subscription, User
 from users.pagination import CustomPagination
-from users.serializers import CustomUserSerializer, SubscriptionSerializer
+from users.serializers import (CustomUserSerializer, SubscribeSerializer,
+                               SubscriptionSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -35,20 +36,29 @@ class CustomUserViewSet(UserViewSet):
     def subscribe(self, request, id):
         subscriber = self.request.user
         author = get_object_or_404(User, id=id)
-        subscription = Subscription.objects.get_or_create(
-            user=subscriber, author=author
-        )
         if request.method == 'POST':
-            serializer = SubscriptionSerializer(subscription[0])
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
+            data = {
+                'user': subscriber.id,
+                'author': author.id,
+            }
+            serializer = SubscribeSerializer(
+                data=data,
+                context={'request': request}
             )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         if request.method == 'DELETE':
-            if not subscriber.following.exists():
+            if not subscriber.follower.filter(author=author).exists():
                 raise exceptions.ValidationError(
                     detail='У вас нет подписки на этого автора!',
                     code=status.HTTP_400_BAD_REQUEST,
                 )
-            subscription[0].delete()
+            subscription = get_object_or_404(
+                Subscription,
+                user=subscriber,
+                author=author,
+            )
+            subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
